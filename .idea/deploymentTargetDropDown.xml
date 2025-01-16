@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="deploymentTargetDropDown">
+    <value>
+      <entry key="app">
+        <State />
+      </entry>
+      <entry key="auth.data">
+        <State />
+      </entry>
+      <entry key="auth.presentation">
+        <State />
+      </entry>
+      <entry key="core.data">
+        <State />
+      </entry>
+      <entry key="core.database">
+        <State />
+      </entry>
+      <entry key="core.presentation.designsystem">
+        <State />
+      </entry>
+      <entry key="core.presentation.ui">
+        <State />
+      </entry>
+      <entry key="run.data">
+        <State />
+      </entry>
+      <entry key="run.location">
+        <State />
+      </entry>
+      <entry key="run.presentation">
+        <State />
+      </entry>
+    </value>
+  </component>
+</project>
