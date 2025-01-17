@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
+// Used for one time events
 @Composable
 fun <T> ObserveAsEvents(
     flow: Flow<T>,

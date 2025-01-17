@@ -51,7 +51,7 @@ internal fun Project.configureBuildTypes(
 private fun BuildType.configureDebugBuildType(
     apiKey: String,
 ) {
-    buildConfigField("string", "API_KEY", apiKey)
+    buildConfigField("String", "API_KEY", apiKey)
     //buildConfigField("String", "BASE_URL", "")
 }
 
@@ -59,7 +59,7 @@ private fun BuildType.configureReleaseBuildType(
     apiKey: String,
     commonExtension: CommonExtension<*, *, *, *, *>
 ) {
-    buildConfigField("string", "API_KEY", apiKey)
+    buildConfigField("String", "API_KEY", "\"$apiKey\"")
     //buildConfigField("String", "BASE_URL", "")
 
     isMinifyEnabled = false
