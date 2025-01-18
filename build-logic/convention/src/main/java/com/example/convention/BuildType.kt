@@ -17,15 +17,16 @@ internal fun Project.configureBuildTypes(
             buildConfig = true
         }
         val apiKey = gradleLocalProperties(rootDir).getProperty("API_KEY")
+        val baseUrl = gradleLocalProperties(rootDir).getProperty("BASE_URL")
         when (extensionType) {
             ExtensionType.APPLICATION -> {
                 extensions.configure<ApplicationExtension> {
                     buildTypes {
                         debug {
-                            configureDebugBuildType(apiKey)
+                            configureDebugBuildType(apiKey, baseUrl)
                         }
                         release {
-                            configureReleaseBuildType(apiKey, commonExtension)
+                            configureReleaseBuildType(apiKey, commonExtension, baseUrl)
                         }
                     }
                 }
@@ -35,10 +36,10 @@ internal fun Project.configureBuildTypes(
                 extensions.configure<LibraryExtension> {
                     buildTypes {
                         debug {
-                            configureDebugBuildType(apiKey)
+                            configureDebugBuildType(apiKey, baseUrl)
                         }
                         release {
-                            configureReleaseBuildType(apiKey, commonExtension)
+                            configureReleaseBuildType(apiKey, commonExtension, baseUrl)
                         }
                     }
                 }
@@ -50,17 +51,19 @@ internal fun Project.configureBuildTypes(
 
 private fun BuildType.configureDebugBuildType(
     apiKey: String,
+    baseUrl: String
 ) {
     buildConfigField("String", "API_KEY", apiKey)
-    //buildConfigField("String", "BASE_URL", "")
+    buildConfigField("String", "BASE_URL", baseUrl)
 }
 
 private fun BuildType.configureReleaseBuildType(
     apiKey: String,
-    commonExtension: CommonExtension<*, *, *, *, *>
+    commonExtension: CommonExtension<*, *, *, *, *>,
+    baseUrl: String
 ) {
     buildConfigField("String", "API_KEY", "\"$apiKey\"")
-    //buildConfigField("String", "BASE_URL", "")
+    buildConfigField("String", "BASE_URL", baseUrl)
 
     isMinifyEnabled = false
     proguardFiles(
