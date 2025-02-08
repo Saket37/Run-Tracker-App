@@ -3,6 +3,7 @@ package com.example.runtracker
 import android.app.Application
 import com.example.auth.data.di.authDataModule
 import com.example.auth.presentation.di.authViewModelModule
+import com.example.core.data.networking.di.coreDataModule
 import com.example.runtracker.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -19,7 +20,7 @@ class RunTracker : Application() {
             androidLogger()
             androidContext(this@RunTracker)
             modules(
-                authDataModule, authViewModelModule, appModule
+                authDataModule, authViewModelModule, appModule, coreDataModule
             )
         }
     }
