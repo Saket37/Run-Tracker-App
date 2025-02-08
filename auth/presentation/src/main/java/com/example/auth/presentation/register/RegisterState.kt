@@ -12,5 +12,5 @@ data class RegisterState(
     val isPasswordVisible: Boolean = true,
     val passwordValidationState: PasswordValidationState = PasswordValidationState(),
     val isRegistering: Boolean = false,
-    val canRegister: Boolean = passwordValidationState.isValid && !isRegistering
+    val canRegister: Boolean = false
 )
