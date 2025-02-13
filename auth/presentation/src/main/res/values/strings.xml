@@ -23,4 +23,5 @@
     <string name="welcome_text">Welcome to your ulimate running companion! Track, analyze your runs.</string>
     <string name="dont_have_an_account">Don\'t have an account?</string>
     <string name="yuore_logged_in">Your\'re logged in.</string>
+    <string name="error_email_password_incorrect">The email or password is incorrect</string>
 </resources>

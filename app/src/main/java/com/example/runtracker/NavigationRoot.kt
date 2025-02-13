@@ -14,6 +14,7 @@ import com.example.auth.presentation.register.RegisterScreenRoot
 fun NavigationRoot(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "auth") {
         authGraph(navController)
+        runGraph(navController)
     }
 }
 
@@ -59,6 +60,19 @@ private fun NavGraphBuilder.authGraph(
                         restoreState = true
                     }
                 })
+        }
+    }
+}
+
+private fun NavGraphBuilder.runGraph(
+    navController: NavHostController
+) {
+    navigation(
+        startDestination = "run-overview",
+        route = "run"
+    ) {
+        composable("run_overview") {
+
         }
     }
 }
