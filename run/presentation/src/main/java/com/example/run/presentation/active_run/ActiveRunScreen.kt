@@ -2,6 +2,11 @@
 
 package com.example.run.presentation.active_run
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,6 +28,8 @@ import com.example.core.presentation.designsystem.components.RunTrackerScaffold
 import com.example.core.presentation.designsystem.components.RunTrackerToolbar
 import com.example.run.presentation.R
 import com.example.run.presentation.active_run.components.RunDataCard
+import com.example.run.presentation.active_run.util.shouldShowLocationPermissionRationale
+import com.example.run.presentation.active_run.util.shouldShowNotificationPermissionRationale
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -37,12 +45,46 @@ fun ActiveRunScreen(
     state: ActiveRunState,
     onAction: (ActiveRunAction) -> Unit
 ) {
+    val context = LocalContext.current
+
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions()
+        ) { perms ->
+            val hasCoarseLocationPermission =
+                perms[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+            val hasFineLocationPermission =
+                perms[Manifest.permission.ACCESS_FINE_LOCATION] == true
+            val hasNotificationPermission = if (Build.VERSION.SDK_INT >= 33) {
+                perms[Manifest.permission.POST_NOTIFICATIONS] == true
+            } else true
+            val activity = context as ComponentActivity
+
+            val showLocationPermissionRationale = activity.shouldShowLocationPermissionRationale()
+            val showNotificationPermissionRationale =
+                activity.shouldShowNotificationPermissionRationale()
+
+            onAction(
+                ActiveRunAction.SubmitLocationPermissionInfo(
+                    acceptedLocationPermission = hasCoarseLocationPermission && hasFineLocationPermission,
+                    showLocationPermissionRationale = showLocationPermissionRationale
+                )
+            )
+            onAction(
+                ActiveRunAction.SubmitNotificationPermissionInfo(
+                    acceptedNotificationPermission = hasNotificationPermission,
+                    showLocationPermissionRationale = showNotificationPermissionRationale
+                )
+            )
+        }
     RunTrackerScaffold(
         withGradient = false,
-        topAppBar = RunTrackerToolbar(
-            showBackButton = true,
-            title = stringResource(id = R.string.active_run),
-            onBackClick = { onAction(ActiveRunAction.OnBackClick) }),
+        topAppBar = {
+            RunTrackerToolbar(
+                showBackButton = true,
+                title = stringResource(id = R.string.active_run),
+                onBackClick = { onAction(ActiveRunAction.OnBackClick) })
+        },
         floatingActionButton = {
             RunTrackerFloatingActionButton(
                 icon = if (state.shouldTrack) StopIcon else StartIcon,
