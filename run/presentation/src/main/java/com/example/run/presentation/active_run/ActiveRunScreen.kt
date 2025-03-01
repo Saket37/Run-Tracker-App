@@ -37,6 +37,7 @@ import com.example.run.presentation.active_run.util.hasLocationPermission
 import com.example.run.presentation.active_run.util.hasNotificationPermission
 import com.example.run.presentation.active_run.util.shouldShowLocationPermissionRationale
 import com.example.run.presentation.active_run.util.shouldShowNotificationPermissionRationale
+import com.example.run.presentation.maps.TrackerMap
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -132,6 +133,13 @@ fun ActiveRunScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
+            TrackerMap(
+                isRunFinished = state.isRunFinished,
+                currentLocation = state.currentLocation,
+                locations = state.runData.locations,
+                onSnapshot = {},
+                modifier = Modifier.fillMaxSize()
+            )
             RunDataCard(
                 elapsedTime = state.elapsedTime,
                 runData = state.runData,
