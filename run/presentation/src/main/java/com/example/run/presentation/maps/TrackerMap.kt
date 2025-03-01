@@ -78,6 +78,7 @@ fun TrackerMap(
         properties = MapProperties(mapStyleOptions = mapStyle),
         uiSettings = MapUiSettings(zoomControlsEnabled = false)
     ) {
+        RunTrackerPolylines(locations)
         if (!isRunFinished && currentLocation != null) {
             MarkerComposable(currentLocation, state = markerState) {
                 Box(
