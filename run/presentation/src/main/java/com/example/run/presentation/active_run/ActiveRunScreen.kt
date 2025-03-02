@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.example.core.presentation.designsystem.RunTrackerTheme
 import com.example.core.presentation.designsystem.StartIcon
 import com.example.core.presentation.designsystem.StopIcon
+import com.example.core.presentation.designsystem.components.ActionButton
 import com.example.core.presentation.designsystem.components.OutlineActionButton
 import com.example.core.presentation.designsystem.components.RunTrackerDialog
 import com.example.core.presentation.designsystem.components.RunTrackerFloatingActionButton
@@ -149,6 +150,35 @@ fun ActiveRunScreen(
                     .fillMaxWidth()
             )
         }
+        if (!state.shouldTrack && state.hasStartedRunning) {
+            RunTrackerDialog(
+                title = stringResource(id = R.string.running_is_paused),
+                onDismiss = {
+                    onAction(ActiveRunAction.OnResumeRunClick)
+                },
+                description = stringResource(id = R.string.resume_or_finish_run),
+                primaryButton = {
+                    ActionButton(
+                        text = stringResource(R.string.resume),
+                        isLoading = false,
+                        onClick = {
+                            onAction(ActiveRunAction.OnResumeRunClick)
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                },
+                secondaryButton = {
+                    OutlineActionButton(
+                        text = stringResource(id = R.string.finish),
+                        isLoading = state.isSavingRun,
+                        onClick = {
+                            onAction(ActiveRunAction.OnFinishRunClick)
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            )
+        }
 
         if (state.showLocationPermissionRationale || state.showNotificationPermissionRationale) {
             RunTrackerDialog(
@@ -169,7 +199,9 @@ fun ActiveRunScreen(
                         onClick = {
                             onAction(ActiveRunAction.DismissRationaleDialog)
                             permissionLauncher.requestRunTrackerPermissions(context)
-                        }
+                        },
+                        modifier = Modifier.weight(1f)
+
                     )
                 }
 
