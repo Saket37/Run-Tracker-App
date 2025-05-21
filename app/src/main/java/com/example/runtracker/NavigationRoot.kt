@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navDeepLink
 import com.example.auth.presentation.intro.IntroScreenRoot
 import com.example.auth.presentation.login.LoginScreenRoot
 import com.example.auth.presentation.register.RegisterScreenRoot
@@ -81,7 +82,9 @@ private fun NavGraphBuilder.runGraph(
                 navController.navigate("active_run")
             })
         }
-        composable("active_run") {
+        composable(route = "active_run", deepLinks = listOf(navDeepLink {
+            uriPattern = "runtracker://active_run"
+        })) {
             ActiveRunScreenRoot()
         }
     }

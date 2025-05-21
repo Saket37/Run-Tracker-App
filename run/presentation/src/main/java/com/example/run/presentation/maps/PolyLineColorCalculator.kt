@@ -37,7 +37,7 @@ object PolyLineColorCalculator {
             ColorUtils.blendARGB(colorStart.toArgb(), colorMid.toArgb(), midRatio.toFloat())
         } else {
             val midToEndRatio = (ratio - 0.5) / 0.5
-            ColorUtils.blendARGB(colorMid.toArgb(), colorEnd.toArgb(), midToEndRatio.toFloat()))
+            ColorUtils.blendARGB(colorMid.toArgb(), colorEnd.toArgb(), midToEndRatio.toFloat())
         }
         return Color(colorInt)
     }
