@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
@@ -14,6 +15,11 @@ import androidx.core.net.toUri
 import com.example.core.presentation.ui.ui.formatted
 import com.example.run.domain.RunningTracker
 import com.example.run.presentation.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.android.ext.android.inject
 
@@ -35,8 +41,26 @@ class ActiveRunService : Service() {
 
     private val runningTracker by inject<RunningTracker>()
 
+    private var serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
     override fun onBind(p0: Intent?): IBinder? {
         return null
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when (intent?.action) {
+            ACTION_START -> {
+                val activityClass = intent.getStringExtra(EXTRA_ACTIVITY_CLASS)
+                    ?: throw IllegalArgumentException("No activity class found")
+                start(Class.forName(activityClass))
+            }
+
+            ACTION_STOP -> {
+                stop()
+            }
+        }
+        return START_STICKY
+
     }
 
     private fun start(activityClass: Class<*>) {
@@ -64,11 +88,19 @@ class ActiveRunService : Service() {
         }
     }
 
+    fun stop() {
+        stopSelf()
+        isServiceActive = false
+        serviceScope.cancel()
+
+        serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    }
+
     private fun updateNotification() {
         runningTracker.elapsedTime.onEach { elapsedTime ->
-            val notification= baseNotification.setContentText(elapsedTime.formatted()).build()
+            val notification = baseNotification.setContentText(elapsedTime.formatted()).build()
             notificationManager.notify(1, notification)
-        }
+        }.launchIn(serviceScope)
     }
 
     private fun createNotificationChannel() {
@@ -83,7 +115,23 @@ class ActiveRunService : Service() {
     }
 
     companion object {
+        private const val ACTION_START = "ACTION_START"
+        private const val ACTION_STOP = "ACTION_STOP"
         var isServiceActive = false
         private const val CHANNEL_ID = "active_run"
+        private const val EXTRA_ACTIVITY_CLASS = "EXTRA_ACTIVITY_CLASS"
+
+        fun createStartIntent(context: Context, activityClass: Class<*>): Intent {
+            return Intent(context, ActiveRunService::class.java).apply {
+                action = ACTION_START
+                putExtra(EXTRA_ACTIVITY_CLASS, activityClass.name)
+            }
+        }
+
+        fun stopIntent(context: Context): Intent {
+            return Intent(context, ActiveRunService::class.java).apply {
+                action = ACTION_STOP
+            }
+        }
     }
 }

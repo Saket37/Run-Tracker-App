@@ -34,6 +34,7 @@ import com.example.core.presentation.designsystem.components.RunTrackerScaffold
 import com.example.core.presentation.designsystem.components.RunTrackerToolbar
 import com.example.run.presentation.R
 import com.example.run.presentation.active_run.components.RunDataCard
+import com.example.run.presentation.active_run.service.ActiveRunService
 import com.example.run.presentation.active_run.util.hasLocationPermission
 import com.example.run.presentation.active_run.util.hasNotificationPermission
 import com.example.run.presentation.active_run.util.shouldShowLocationPermissionRationale
@@ -42,9 +43,13 @@ import com.example.run.presentation.maps.TrackerMap
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ActiveRunScreenRoot(viewModel: ActiveRunViewModel = koinViewModel()) {
+fun ActiveRunScreenRoot(
+    viewModel: ActiveRunViewModel = koinViewModel(),
+    onServiceToggle: (isServiceStarted: Boolean) -> Unit
+) {
     ActiveRunScreen(
         state = viewModel.state,
+        onServiceToggle = onServiceToggle,
         onAction = viewModel::onAction
     )
 }
@@ -52,6 +57,7 @@ fun ActiveRunScreenRoot(viewModel: ActiveRunViewModel = koinViewModel()) {
 @Composable
 fun ActiveRunScreen(
     state: ActiveRunState,
+    onServiceToggle: (isServiceStarted: Boolean) -> Unit,
     onAction: (ActiveRunAction) -> Unit
 ) {
     val context = LocalContext.current
@@ -107,6 +113,16 @@ fun ActiveRunScreen(
 
         if (!showLocationPermissionRationale && !showNotificationPermissionRationale) {
             permissionLauncher.requestRunTrackerPermissions(context)
+        }
+    }
+    LaunchedEffect(state.isRunFinished) {
+        if (state.isRunFinished) {
+            onServiceToggle(false)
+        }
+    }
+    LaunchedEffect(state.shouldTrack) {
+        if (context.hasLocationPermission() && state.shouldTrack && !ActiveRunService.isServiceActive) {
+            onServiceToggle(true)
         }
     }
 
@@ -238,7 +254,7 @@ private fun ActivityResultLauncher<Array<String>>.requestRunTrackerPermissions(
 @Composable
 private fun ActiveRunScreenPreview() {
     RunTrackerTheme {
-        ActiveRunScreen(state = ActiveRunState(), {})
+        ActiveRunScreen(state = ActiveRunState(), onServiceToggle = {}, {})
     }
 
 }

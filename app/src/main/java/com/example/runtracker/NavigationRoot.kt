@@ -1,6 +1,7 @@
 package com.example.runtracker
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -11,7 +12,9 @@ import com.example.auth.presentation.intro.IntroScreenRoot
 import com.example.auth.presentation.login.LoginScreenRoot
 import com.example.auth.presentation.register.RegisterScreenRoot
 import com.example.run.presentation.active_run.ActiveRunScreenRoot
+import com.example.run.presentation.active_run.service.ActiveRunService
 import com.example.run.presentation.run_overview.RunOverviewScreenRoot
+import com.example.runtracker.ui.MainActivity
 
 @Composable
 fun NavigationRoot(
@@ -85,7 +88,25 @@ private fun NavGraphBuilder.runGraph(
         composable(route = "active_run", deepLinks = listOf(navDeepLink {
             uriPattern = "runtracker://active_run"
         })) {
-            ActiveRunScreenRoot()
+            val context = LocalContext.current
+            ActiveRunScreenRoot(
+                onServiceToggle = { shouldServiceRun ->
+                    if (shouldServiceRun) {
+                        context.startService(
+                            ActiveRunService.createStartIntent(
+                                context,
+                                MainActivity::class.java
+                            )
+                        )
+                    } else {
+                        context.startService(
+                            ActiveRunService.stopIntent(
+                                context
+                            )
+                        )
+                    }
+                }
+            )
         }
     }
 }
