@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.runtracker.android.application.compose)
     alias(libs.plugins.runtracker.jvm.ktor)
-    alias(libs.plugins.mapsplatform.secrets.plugin)
 }
 android {
     namespace = "com.example.runtracker"
