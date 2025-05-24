@@ -6,6 +6,7 @@ import com.example.auth.presentation.di.authViewModelModule
 import com.example.core.data.networking.di.coreDataModule
 import com.example.core.database.di.databaseModule
 import com.example.run.location.di.locationModule
+import com.example.run.networking.di.networkModule
 import com.example.run.presentation.di.runPresentationModule
 import com.example.runtracker.di.appModule
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +35,8 @@ class RunTracker : Application() {
                 coreDataModule,
                 runPresentationModule,
                 locationModule,
-                databaseModule
+                databaseModule,
+                networkModule
             )
         }
     }

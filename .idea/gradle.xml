@@ -41,6 +41,7 @@
             <option value="$PROJECT_DIR$/run/domain" />
             <option value="$PROJECT_DIR$/run/location" />
             <option value="$PROJECT_DIR$/run/network" />
+            <option value="$PROJECT_DIR$/run/networking" />
             <option value="$PROJECT_DIR$/run/presentation" />
           </set>
         </option>
