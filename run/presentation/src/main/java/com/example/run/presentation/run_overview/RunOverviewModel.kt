@@ -23,6 +23,7 @@ class RunOverviewModel(private val runRepository: RunRepository) : ViewModel() {
         }.launchIn(viewModelScope)
 
         viewModelScope.launch {
+            runRepository.syncPendingRuns()
             runRepository.fetchRuns()
         }
     }
