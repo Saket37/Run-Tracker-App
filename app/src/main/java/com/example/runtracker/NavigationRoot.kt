@@ -81,9 +81,17 @@ private fun NavGraphBuilder.runGraph(
         route = "run"
     ) {
         composable("run_overview") {
-            RunOverviewScreenRoot(onStartRunClick = {
-                navController.navigate("active_run")
-            })
+            RunOverviewScreenRoot(
+                onStartRunClick = {
+                    navController.navigate("active_run")
+                },
+                onLogoutClick = {
+                    navController.navigate("auth") {
+                        popUpTo("run") {
+                            inclusive = true
+                        }
+                    }
+                })
         }
         composable(route = "active_run", deepLinks = listOf(navDeepLink {
             uriPattern = "runtracker://active_run"
