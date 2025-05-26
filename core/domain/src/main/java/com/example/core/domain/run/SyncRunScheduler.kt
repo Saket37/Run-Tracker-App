@@ -1,6 +1,5 @@
-package com.example.run.domain
+package com.example.core.domain.run
 
-import com.example.core.domain.run.Run
 import kotlin.time.Duration
 
 interface SyncRunScheduler {
