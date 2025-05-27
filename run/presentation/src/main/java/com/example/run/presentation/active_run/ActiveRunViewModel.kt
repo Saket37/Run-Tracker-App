@@ -136,10 +136,10 @@ class ActiveRunViewModel(
 
     private fun finishRun(mapPictureBytes: ByteArray) {
         val locations = state.runData.locations
-        if (locations.isEmpty() || locations.first().size <= 1) {
-            state = state.copy(isSavingRun = false)
-            return
-        }
+//        if (locations.isEmpty() || locations.first().size <= 1) {
+//            state = state.copy(isSavingRun = false)
+//            return
+//        }
 
         viewModelScope.launch {
             val run = Run(
