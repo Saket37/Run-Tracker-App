@@ -44,12 +44,12 @@ class ActiveRunViewModel(
     private val hasLocationPermission = MutableStateFlow(false)
 
     private val shouldTrack =
-        snapshotFlow { state.shouldTrack }.stateIn(viewModelScope, SharingStarted.Lazily, state)
+        snapshotFlow { state.shouldTrack }.stateIn(viewModelScope, SharingStarted.Lazily, state.shouldTrack)
 
     private val isTracking = combine(
         shouldTrack, hasLocationPermission
     ) { shouldTrack, hasLocationPermission ->
-        shouldTrack as Boolean && hasLocationPermission
+        shouldTrack&& hasLocationPermission
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     init {

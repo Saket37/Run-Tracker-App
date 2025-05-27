@@ -77,7 +77,7 @@ private fun NavGraphBuilder.runGraph(
     navController: NavHostController
 ) {
     navigation(
-        startDestination = "run-overview",
+        startDestination = "run_overview",
         route = "run"
     ) {
         composable("run_overview") {
