@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.zip
 import kotlin.math.roundToInt
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
 
 class RunningTracker(
@@ -37,38 +36,45 @@ class RunningTracker(
     private val _elapsedTime = MutableStateFlow(Duration.ZERO)
     val elapsedTime = _elapsedTime.asStateFlow()
 
-
-    val currentLocation = isObservingLocation.flatMapLatest { isObserving ->
-        if (isObserving)
-            locationObserver.observeLocation(1000L)
-        else flowOf()
-    }.stateIn(applicationScope, SharingStarted.Lazily, null)
+    val currentLocation = isObservingLocation
+        .flatMapLatest { isObservingLocation ->
+            if(isObservingLocation) {
+                locationObserver.observeLocation(1000L)
+            } else flowOf()
+        }
+        .stateIn(
+            applicationScope,
+            SharingStarted.Lazily,
+            null
+        )
 
     init {
         _isTracking
-            .onEach { tracking ->
-                if (!tracking) {
+            .onEach { isTracking ->
+                if(!isTracking) {
                     val newList = buildList {
                         addAll(runData.value.locations)
                         add(emptyList<LocationTimestamp>())
                     }.toList()
-                    _runData.update {
-                        it.copy(locations = newList)
-                    }
+                    _runData.update { it.copy(
+                        locations = newList
+                    ) }
                 }
             }
             .flatMapLatest { isTracking ->
-                if (isTracking) {
+                if(isTracking) {
                     Timer.timeAndEmit()
                 } else flowOf()
-            }.onEach {
+            }
+            .onEach {
                 _elapsedTime.value += it
-            }.launchIn(applicationScope)
+            }
+            .launchIn(applicationScope)
 
         currentLocation
             .filterNotNull()
             .combineTransform(_isTracking) { location, isTracking ->
-                if (isTracking) {
+                if(isTracking) {
                     emit(location)
                 }
             }
@@ -80,18 +86,22 @@ class RunningTracker(
             }
             .onEach { location ->
                 val currentLocations = runData.value.locations
-                val lastLocationsList = if (currentLocations.isNotEmpty()) {
-                    currentLocations.last() + currentLocations
+                val lastLocationsList = if(currentLocations.isNotEmpty()) {
+                    currentLocations.last() + location
                 } else listOf(location)
                 val newLocationsList = currentLocations.replaceLast(lastLocationsList)
 
-                val distanceMeters =
-                    LocationDataCalculator.getTotalDistanceMeters(locations = newLocationsList as List<List<LocationTimestamp>>)
-
+                val distanceMeters = LocationDataCalculator.getTotalDistanceMeters(
+                    locations = newLocationsList
+                )
                 val distanceKm = distanceMeters / 1000.0
                 val currentDuration = location.durationTimestamp
-                val avgSecondsPerKm =
-                    if (distanceKm == 0.0) 0 else (currentDuration.inWholeSeconds / distanceKm).roundToInt()
+
+                val avgSecondsPerKm = if(distanceKm == 0.0) {
+                    0
+                } else {
+                    (currentDuration.inWholeSeconds / distanceKm).roundToInt()
+                }
 
                 _runData.update {
                     RunData(
@@ -100,7 +110,6 @@ class RunningTracker(
                         locations = newLocationsList
                     )
                 }
-
             }
             .launchIn(applicationScope)
     }
@@ -120,14 +129,13 @@ class RunningTracker(
     fun finishRun() {
         stopObservingLocation()
         setIsTracking(false)
-        _elapsedTime.value = ZERO
+        _elapsedTime.value = Duration.ZERO
         _runData.value = RunData()
     }
-
 }
 
 private fun <T> List<List<T>>.replaceLast(replacement: List<T>): List<List<T>> {
-    if (this.isEmpty()) {
+    if(this.isEmpty()) {
         return listOf(replacement)
     }
     return this.dropLast(1) + listOf(replacement)

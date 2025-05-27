@@ -16,42 +16,53 @@ import com.example.run.presentation.active_run.service.ActiveRunService
 import com.example.run.presentation.run_overview.RunOverviewScreenRoot
 import com.example.runtracker.ui.MainActivity
 
+
 @Composable
 fun NavigationRoot(
     navController: NavHostController,
     isLoggedIn: Boolean
 ) {
-    NavHost(navController = navController, startDestination = if (isLoggedIn) "run" else "auth") {
+    NavHost(
+        navController = navController,
+        startDestination = if (isLoggedIn) "run" else "auth"
+    ) {
         authGraph(navController)
         runGraph(navController)
     }
 }
 
-private fun NavGraphBuilder.authGraph(
-    navController: NavHostController
-) {
-    navigation(startDestination = "intro", route = "auth") {
+private fun NavGraphBuilder.authGraph(navController: NavHostController) {
+    navigation(
+        startDestination = "intro",
+        route = "auth"
+    ) {
         composable(route = "intro") {
-            IntroScreenRoot(onSignInClick = {
-                navController.navigate("login")
-            }, onSignUpClick = {
-                navController.navigate("register")
-            })
+            IntroScreenRoot(
+                onSignUpClick = {
+                    navController.navigate("register")
+                },
+                onSignInClick = {
+                    navController.navigate("login")
+                }
+            )
         }
         composable(route = "register") {
-            RegisterScreenRoot(onSignInClick = {
-                navController.navigate("login") {
-                    popUpTo("register") {
-                        inclusive = true
-                        saveState = true
+            RegisterScreenRoot(
+                onSignInClick = {
+                    navController.navigate("login") {
+                        popUpTo("register") {
+                            inclusive = true
+                            saveState = true
+                        }
+                        restoreState = true
                     }
-                    restoreState = true
+                },
+                onSuccessfulRegistration = {
+                    navController.navigate("login")
                 }
-            }, onSuccessfulRegistration = {
-                navController.navigate("login")
-            })
+            )
         }
-        composable(route = "login") {
+        composable("login") {
             LoginScreenRoot(
                 onLoginSuccess = {
                     navController.navigate("run") {
@@ -68,16 +79,15 @@ private fun NavGraphBuilder.authGraph(
                         }
                         restoreState = true
                     }
-                })
+                }
+            )
         }
     }
 }
 
-private fun NavGraphBuilder.runGraph(
-    navController: NavHostController
-) {
+private fun NavGraphBuilder.runGraph(navController: NavHostController) {
     navigation(
-        startDestination = "run-overview",
+        startDestination = "run_overview",
         route = "run"
     ) {
         composable("run_overview") {
@@ -91,19 +101,26 @@ private fun NavGraphBuilder.runGraph(
                             inclusive = true
                         }
                     }
-                })
+                }
+            )
         }
         composable(route = "active_run", deepLinks = listOf(navDeepLink {
             uriPattern = "runtracker://active_run"
         })) {
             val context = LocalContext.current
             ActiveRunScreenRoot(
+                onBack = {
+                    navController.navigateUp()
+                },
+                onFinish = {
+                    navController.navigateUp()
+                },
                 onServiceToggle = { shouldServiceRun ->
                     if (shouldServiceRun) {
                         context.startService(
                             ActiveRunService.createStartIntent(
-                                context,
-                                MainActivity::class.java
+                                context = context,
+                                activityClass = MainActivity::class.java
                             )
                         )
                     } else {
@@ -113,12 +130,6 @@ private fun NavGraphBuilder.runGraph(
                             )
                         )
                     }
-                },
-                onFinish = {
-                    navController.navigateUp()
-                },
-                onBack = {
-                    navController.navigateUp()
                 }
             )
         }

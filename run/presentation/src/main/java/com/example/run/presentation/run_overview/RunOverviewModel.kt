@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.minutes
 
 class RunOverviewModel(
     private val runRepository: RunRepository,
@@ -27,21 +26,21 @@ class RunOverviewModel(
 
     init {
 
-        viewModelScope.launch {
-            syncRunScheduler.scheduleSync(
-                type = SyncRunScheduler.SyncType.FetchRuns(30.minutes)
-            )
-        }
+//        viewModelScope.launch {
+//            syncRunScheduler.scheduleSync(
+//                type = SyncRunScheduler.SyncType.FetchRuns(30.minutes)
+//            )
+//        }
 
         runRepository.getRuns().onEach { runs ->
             val runUi = runs.map { it.toRunUI() }
             state = state.copy(runs = runUi)
         }.launchIn(viewModelScope)
 
-        viewModelScope.launch {
-            runRepository.syncPendingRuns()
-            runRepository.fetchRuns()
-        }
+//        viewModelScope.launch {
+//            runRepository.syncPendingRuns()
+//            runRepository.fetchRuns()
+//        }
     }
 
     fun onAction(action: RunOverviewAction) {
@@ -60,9 +59,9 @@ class RunOverviewModel(
 
     private fun logout() {
         applicationScope.launch {
-            syncRunScheduler.cancelAllSyncs()
-            runRepository.deleteAllRuns()
-            runRepository.logout()
+            //syncRunScheduler.cancelAllSyncs()
+            //runRepository.deleteAllRuns()
+            //runRepository.logout()
             sessionStorage.set(null)
         }
     }

@@ -12,16 +12,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.auth.domain.AuthRepository
 import com.example.auth.domain.UserDataValidator
-import com.example.auth.presentation.R
-import com.example.core.domain.util.DataError
-import com.example.core.domain.util.Result
-import com.example.core.presentation.ui.ui.UiText
-import com.example.core.presentation.ui.ui.asUiText
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 class RegisterViewModel(
     private val userDataValidator: UserDataValidator,
@@ -51,6 +48,7 @@ class RegisterViewModel(
         }.launchIn(viewModelScope)
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
     fun onAction(action: RegisterAction) {
         when (action) {
 
@@ -75,7 +73,7 @@ class RegisterViewModel(
             )
             state = state.copy(isRegistering = false)
 
-            when (result) {
+            /*when (result) {
                 is Result.Error -> {
                     if (result.error == DataError.Network.CONFLICT) {
                         eventChannel.send(RegisterEvent.Error(UiText.StringResource(R.string.error_email_exists)))
@@ -86,7 +84,10 @@ class RegisterViewModel(
                 is Result.Success -> {
                     eventChannel.send(RegisterEvent.OnSuccessfulRegistration)
                 }
-            }
+            }*/
+           delay(2.seconds)
+
+            eventChannel.send(RegisterEvent.OnSuccessfulRegistration)
         }
     }
 }

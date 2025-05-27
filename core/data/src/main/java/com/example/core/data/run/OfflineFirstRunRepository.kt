@@ -50,7 +50,8 @@ class OfflineFirstRunRepository(
     }
 
     override suspend fun upsertRun(run: Run, mapPicture: ByteArray): EmptyResult<DataError> {
-        val localResult = localRunDataSource.upsertRun(run)
+        return localRunDataSource.upsertRun(run).asEmptyDataResult()
+       /* val localResult = localRunDataSource.upsertRun(run)
         if (localResult !is Result.Success) {
             return localResult.asEmptyDataResult()
         }
@@ -74,31 +75,31 @@ class OfflineFirstRunRepository(
                     localRunDataSource.upsertRun(remoteResult.data).asEmptyDataResult()
                 }.await()
             }
-        }
+        }*/
     }
 
     override suspend fun deleteRun(id: RunId) {
         localRunDataSource.deleteRun(id)
 
         // Edge case where the run is created in offline-mode and deleted in offline mode, in that case we do not need to sync
-        val isPendingSync = runPendingSyncDao.getRunPendingSyncEntity(id) != null
-        if (isPendingSync) {
-            runPendingSyncDao.deleteRunPendingSyncEntity(id)
-            return
-        }
-        val remoteResult = applicationScope.async {
-            remoteRunDataSource.deleteRun(id)
-        }.await()
-
-        if (remoteResult is Result.Error) {
-            applicationScope.launch {
-                syncRunScheduler.scheduleSync(
-                    type = SyncRunScheduler.SyncType.DeleteRun(
-                        runId = id
-                    )
-                )
-            }.join()
-        }
+//        val isPendingSync = runPendingSyncDao.getRunPendingSyncEntity(id) != null
+//        if (isPendingSync) {
+//            runPendingSyncDao.deleteRunPendingSyncEntity(id)
+//            return
+//        }
+//        val remoteResult = applicationScope.async {
+//            remoteRunDataSource.deleteRun(id)
+//        }.await()
+//
+//        if (remoteResult is Result.Error) {
+//            applicationScope.launch {
+//                syncRunScheduler.scheduleSync(
+//                    type = SyncRunScheduler.SyncType.DeleteRun(
+//                        runId = id
+//                    )
+//                )
+//            }.join()
+//        }
     }
 
     override suspend fun syncPendingRuns() {
