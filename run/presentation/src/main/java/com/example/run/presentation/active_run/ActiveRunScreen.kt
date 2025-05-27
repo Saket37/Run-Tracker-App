@@ -61,7 +61,7 @@ fun ActiveRunScreenRoot(
             }
 
             ActiveRunEvent.RunSaved -> {
-
+                onFinish()
             }
         }
     }
